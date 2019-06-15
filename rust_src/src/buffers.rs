@@ -281,6 +281,12 @@ impl LispBufferRef {
         self.name_.is_not_nil()
     }
 
+    // Check if the buffer is hidden. Indicated by the first character/byte
+    // being a ' ' rather than the first character of the buffer name
+    //pub fn is_hidden(self) -> bool {
+        //self.name_.byte_at(0) == b' '
+    //}
+
     pub fn set_pt_both(&mut self, charpos: ptrdiff_t, byte: ptrdiff_t) {
         self.pt = charpos;
         self.pt_byte = byte;
@@ -1843,6 +1849,14 @@ pub fn byte_char_debug_check(b: LispBufferRef, charpos: isize, bytepos: isize) {
     if charpos - 1 != nchars {
         panic!("byte_char_debug_check failed.")
     }
+}
+
+// TODO find a way to check the first byte
+// Return true if B can be used as 'other-than-BUFFER' buffer
+pub fn _candidate_buffer(b: LispObject, buffer: LispObject) -> bool {
+    b.is_buffer() && !b.eq(buffer)
+        && b.as_buffer().unwrap().is_live()
+        //&& b.as_buffer().unwrap().is_hidden()
 }
 
 include!(concat!(env!("OUT_DIR"), "/buffers_exports.rs"));
